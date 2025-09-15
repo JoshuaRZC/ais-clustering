@@ -1,0 +1,2 @@
+channelNumber;id;NavStatus;SlotOffset;SlotNumber;STO;SlotIncrement;KeepFlag;TS;Lat;Lon;Sog;thresholdSog;Course;Heading;ChangeHeading;RepeatIndicator;SpecialManoeuvre;AISVersion;toa;DiffToa
+1;3;0;-1;-1;-1;287;0;1854;47.912261666666666;-6.6046233333333335;12.100000381469727;2;55.29999923706055;54;0;0;0;-1;1062290.859924316;0.0
