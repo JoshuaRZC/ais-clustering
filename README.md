@@ -4,14 +4,14 @@ AIS Transceivers (Transponders) share the radio bandwidth (161.975 MHz and 162.0
 
 Each AIS transceiver must determine its own TDMA slot allocation, and critically, it must avoid using a slot that is in use by another vessel within reception range in order to avoid transmissions clashing.
 
-## Transponder Mechanism
+## 1 Transponder Mechanism
 
-### Time Slot Calculation
+### 1.1 Time Slot Calculation
 
 - Slot Reservation: To simplify the time slot calculation, the AIS Transponders book the slots before sending message. And they use the same timeslot (`TS`) for several messages (`STO`).
 - Special Maneuver: When the boat changes the speed or has a special maneuver, it sends message with `id=3`. To adjust the frequency, it needs to send new messages which can have two different patterns. One pattern is to keep the new slot(`keepflag = 1`). The other one is to reserve a new timeslot (`TS_new`xcx).
 
-### Message-Sending Rule
+### 1.2 Message-Sending Rule
 
 - The frequency of messages depend on the speed of the boat (`sog`) and course changing (`Course`)
 
@@ -26,9 +26,9 @@ Each AIS transceiver must determine its own TDMA slot allocation, and critically
 | Ship > 23 knots | 2 seconds |
 | Ship > 23 and changing course | 2 seconds |
 
-## Data
+## 2 Data
 
-### Raw Data
+### 2.1 Raw Data
 
 - File-Based Splitting
 - Data Field: The −1 in the csv are non documented values (NaN values with numpy)
@@ -54,7 +54,7 @@ Each AIS transceiver must determine its own TDMA slot allocation, and critically
     - `toa`: Time of emission.
     - `DiffToa`: Difference in time with previous emission.
 
-### Feature Data
+### 2.2 Feature Data
 
 - Feature Data: The feature variables used to cluster the data is related to Constructor Signatures.
 - Feature Data Constructor Signature: Constructor Signature is the small difference between information sent by each boat.
@@ -82,3 +82,23 @@ Each AIS transceiver must determine its own TDMA slot allocation, and critically
     - `SpecialManoeuvre`: 0 = not available = default 1 = not engaged in special maneuver, 2 = engaged in special maneuver (i.e. regional passing arrangement on Inland Waterway).
     - `toa`: Time of emission.
     - `DiffToa`: Difference in time with previous emission.
+
+## 3 Methodology
+
+Our project follows a three-stage pipeline to analyze AIS transponder behaviors and identify constructor-specific signatures:
+
+1. **Data Preprocessing**
+   - Loaded and merged 720 AIS CSV files (with quality control to remove outliers).
+   - Computed additional features such as *ChangeCourse* and filtered irrelevant attributes.
+2. **Signature Extraction**
+   - Derived unique constructor signatures from transmission patterns:
+     - **Synchronization Errors**: deviation between assigned and actual slots.
+     - **Regularity of Messages**: comparison of emission intervals against IMO standards.
+     - **STO & Slot Sampling**: statistical characterization of sampling behaviors.
+     - **Channel Preference**: alternation patterns between channels.
+   - Aggregated these into a feature matrix representing each ship’s transponder behavior.
+3. **Clustering and Evaluation**
+   - Standardized features with Z-score normalization and confirmed low correlation among signatures.
+   - Applied **K-Means** for unsupervised clustering on complete data.
+   - Used **KNN** to classify ships with missing signatures based on partial data.
+   - Combined results to assign each ship to a constructor cluster and evaluated via correlation heatmaps.
